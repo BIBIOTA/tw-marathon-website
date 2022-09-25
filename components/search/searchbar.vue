@@ -93,6 +93,6 @@ export default defineComponent({
     @apply flex flex-col justify-center items-center lg:flex-row;
   }
   div.searchBox div {
-    @apply mx-2 mb-5 lg:mb-2;
+    @apply mx-2 mb-2 lg:mb-0;
   }
 </style>

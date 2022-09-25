@@ -1,5 +1,5 @@
 <template>
-  <div class="m-auto w-3/12 flex justify-center pt-10 pb-5 border-b-4">
+  <div class="m-auto w-80 flex justify-center pt-10 pb-5 mb-10 border-b-4 lg:w-3/12 lg:mb-2">
     <h1 class="text-3xl font-bold">
       台灣路跑賽事
     </h1>
