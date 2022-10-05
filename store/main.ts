@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { EventDto } from '@/dtos/events-response-dto';
 import { EventTableDto } from '@/dtos/event-table-dto';
 import { getEventDistancesTags, getEventEntryDateRange } from '@/libs/event-helper';
+import _ from 'lodash';
 
 export const useStore = defineStore('Main', {
   state: () => ({
@@ -11,6 +12,7 @@ export const useStore = defineStore('Main', {
     eventModal: null,
     keywords: '',
     distances: [],
+    onlyRegistering: [false],
     dateRange: null,
     events: [],
     totalCount: 0,
@@ -38,6 +40,7 @@ export const useStore = defineStore('Main', {
     },
     getKeywords: (state): String|null => state.keywords !== '' ? state.keywords : null,
     getDistances: (state): String[]|null => state.distances.length > 0 ? state.distances : null,
+    getOnlyRegistering: (state): Boolean => _.first(state.onlyRegistering),
     getDateRange: (state): String[]|null => state.dateRange ? state.dateRange.map((date) => dayjs(date).format('YYYY-MM-DD')) : null,
     getVisibleModal: (state): Boolean => state.visibleModal,
   },

@@ -2,10 +2,12 @@ lockfileVersion: 5.4
 
 specifiers:
   '@pinia/nuxt': ^0.4.2
+  '@types/lodash': ^4.14.186
   ant-design-vue: ^3.2.12
   autoprefixer: ^10.4.11
   axios: ^0.27.2
   dayjs: ^1.11.5
+  lodash: ^4.17.21
   nuxt: 3.0.0-rc.10
   pinia: ^2.0.22
   postcss: ^8.4.16
@@ -13,16 +15,18 @@ specifiers:
 
 dependencies:
   '@pinia/nuxt': 0.4.2
+  '@types/lodash': 4.14.186
   ant-design-vue: 3.2.12
   axios: 0.27.2
   dayjs: 1.11.5
+  lodash: 4.17.21
   pinia: 2.0.22
 
 devDependencies:
   autoprefixer: 10.4.11_postcss@8.4.16
   nuxt: 3.0.0-rc.10
   postcss: 8.4.16
-  tailwindcss: 3.1.8
+  tailwindcss: 3.1.8_postcss@8.4.16
 
 packages:
 
@@ -770,6 +774,10 @@ packages:
   /@types/estree/1.0.0:
     resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
     dev: true
+
+  /@types/lodash/4.14.186:
+    resolution: {integrity: sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==}
+    dev: false
 
   /@types/node/18.7.18:
     resolution: {integrity: sha512-m+6nTEOadJZuTPkKR/SYK3A2d7FZrgElol9UP1Kae90VVU4a6mxnPuLiIW1m4Cq4gZ/nWb9GrdVXJCoCazDAbg==}
@@ -4198,10 +4206,12 @@ packages:
       stable: 0.1.8
     dev: true
 
-  /tailwindcss/3.1.8:
+  /tailwindcss/3.1.8_postcss@8.4.16:
     resolution: {integrity: sha512-YSneUCZSFDYMwk+TGq8qYFdCA3yfBRdBlS7txSq0LUmzyeqRe3a8fBQzbz9M3WS/iFT4BNf/nmw9mEzrnSaC0g==}
     engines: {node: '>=12.13.0'}
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3

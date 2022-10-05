@@ -1,13 +1,16 @@
 <template>
   <div class="my-2">
     <div class="searchBox">
-      <div>
+      <div class="lg:border-r-2 lg:py-2">
         <Input />
       </div>
-      <div>
-        <Checkbox />
+      <div class="lg:border-r-2 lg:py-2">
+        <Checkbox :options="marathonOptions" :keyName="'distances'" />
       </div>
-      <div>
+      <div class="lg:border-r-2 lg:py-2">
+        <Checkbox :options="entryOptions" :keyName="'onlyRegistering'" />
+      </div>
+      <div class="lg:border-r-2 lg:py-2">
         <DatePicker />
       </div>
       <div>
@@ -39,6 +42,17 @@ import Modal from './modal.vue';
 export default defineComponent({
   name: 'SearchBar',
   setup() {
+
+    const marathonOptions = [
+      { label: '全馬', value: 'MARATHON' },
+      { label: '半馬', value: 'HALF_MARATHON' },
+      { label: '10公里', value: 'TEN_K' },
+    ];
+
+    const entryOptions = [
+      { label: '開放報名中', value: true },
+    ];
+
     onMounted(async () => {
       await search();
     })
@@ -51,6 +65,7 @@ export default defineComponent({
         getKeywords,
         getDistances,
         getDateRange,
+        getOnlyRegistering,
         setIsApiLoading,
         setTotalCount,
         setEvents
@@ -60,6 +75,7 @@ export default defineComponent({
         keywords: getKeywords,
         distances: getDistances,
         dateRange: getDateRange,
+        onlyRegistering: getOnlyRegistering,
       }
       
       setIsApiLoading(true);
@@ -74,6 +90,8 @@ export default defineComponent({
     }
 
     return {
+      entryOptions,
+      marathonOptions,
       store,
       search,
     };
