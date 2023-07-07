@@ -1,12 +1,12 @@
 import { EventDistanceTagDto } from "./event-distance-tag-dto";
 
 export class EventTableDto {
-  id: Number;
-  eventDate: String
-  eventTime?: String
-  eventName: String
-  location: String
+  id: number;
+  eventDate: string
+  eventTime?: string
+  eventName: string
+  location: string
   distances: EventDistanceTagDto[]
-  agent?: String
-  entryDateRage?: String
+  agent?: string
+  entryDateRage?: string
 }

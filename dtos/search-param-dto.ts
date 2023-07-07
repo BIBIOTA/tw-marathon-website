@@ -1,6 +1,6 @@
 export class SearchParamsDto {
-  keywords?: String;
-  distances?: String[];
-  dateRange?: String[];
-  onlyRegistering?: Boolean;
+  keywords?: string;
+  distances?: string[];
+  dateRange?: string[];
+  onlyRegistering?: boolean;
 }

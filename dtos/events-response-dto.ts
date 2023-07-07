@@ -2,30 +2,30 @@ import { EVENT_CERTIFICATE } from "@/enum/event-certificate.enum";
 import { EVENT_STATUS } from "@/enum/event-status.enum";
 
 export class EventDistanceDto {
-  distance?: Number;
-  complexDistance?: String;
-  eventPrice?: Number;
-  eventLimit?: Number;
+  distance?: number;
+  complexDistance?: string;
+  eventPrice?: number;
+  eventLimit?: number;
 }
 
 export class EventDto {
-  id: Number;
-  eventName: String;
-  eventInfo?: String;
-  eventLink?: String;
+  id: number;
+  eventName: string;
+  eventInfo?: string;
+  eventLink?: string;
   eventStatus: EVENT_STATUS;
   eventCertificate?: EVENT_CERTIFICATE;
-  eventDate: String;
-  eventTime?: String;
-  location?: String;
+  eventDate: string;
+  eventTime?: string;
+  location?: string;
   distances: EventDistanceDto[];
-  agent?: String;
-  entryIsEnd: Boolean;
-  entryStartDate?: String;
-  entryEndDate?: String;
+  agent?: string;
+  entryIsEnd: boolean;
+  entryStartDate?: string;
+  entryEndDate?: string;
 }
 
 export class EventsResponseDto {
-  totalCount: Number;
+  totalCount: number;
   events: EventDto[];
 }

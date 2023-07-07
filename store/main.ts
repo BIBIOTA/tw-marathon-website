@@ -4,6 +4,7 @@ import { EventDto } from '@/dtos/events-response-dto';
 import { EventTableDto } from '@/dtos/event-table-dto';
 import { getEventDistancesTags, getEventEntryDateRange } from '@/libs/event-helper';
 import _ from 'lodash';
+import { SearchParamsDto } from '@/dtos/search-param-dto';
 
 export const useStore = defineStore('Main', {
   state: () => ({
@@ -38,23 +39,29 @@ export const useStore = defineStore('Main', {
         };
       });
     },
-    getKeywords: (state): String|null => state.keywords !== '' ? state.keywords : null,
-    getDistances: (state): String[]|null => state.distances.length > 0 ? state.distances : null,
-    getOnlyRegistering: (state): Boolean => _.first(state.onlyRegistering),
-    getDateRange: (state): String[]|null => state.dateRange ? state.dateRange.map((date) => dayjs(date).format('YYYY-MM-DD')) : null,
-    getVisibleModal: (state): Boolean => state.visibleModal,
+    getKeywords: (state): string|null => state.keywords !== '' ? state.keywords : null,
+    getDistances: (state): string[]|null => state.distances.length > 0 ? state.distances : null,
+    getOnlyRegistering: (state): boolean => _.first(state.onlyRegistering),
+    getDateRange: (state): string[]|null => state.dateRange ? state.dateRange.map((date) => dayjs(date).format('YYYY-MM-DD')) : null,
+    getVisibleModal: (state): boolean => state.visibleModal,
   },
   actions: {
-    setIsApiLoading(status: Boolean): void {
+    setSearchParams(dto: SearchParamsDto): void {
+      this.keywords = dto.keywords;
+      this.distances = dto.distances;
+      this.onlyRegistering = [dto.onlyRegistering];
+      this.dateRange = dto.dateRange;
+    },
+    setIsApiLoading(status: boolean): void {
       this.isApiLoading = status;
     },
-    setTotalCount(totalCount: Number): void {
+    setTotalCount(totalCount: number): void {
       this.totalCount = totalCount;
     },
     setEvents(events: EventDto[]): void {
       this.events = events;
     },
-    setVisiableModal(status: Boolean): void {
+    setVisiableModal(status: boolean): void {
       this.visibleModal = status;
     },
     setEventModal(eventModal: EventDto): void {

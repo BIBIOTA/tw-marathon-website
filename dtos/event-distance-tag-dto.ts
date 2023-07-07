@@ -1,4 +1,4 @@
 export class EventDistanceTagDto {
-  distance: String
-  color: String
+  distance: string
+  color: string
 } 

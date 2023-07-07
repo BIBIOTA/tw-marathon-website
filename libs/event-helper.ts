@@ -1,7 +1,7 @@
 import { EventDistanceDto, EventDto } from "@/dtos/events-response-dto";
 import { EventDistanceTagDto } from "@/dtos/event-distance-tag-dto";
 
-export const getEventEntryDateRange = (entryIsEnd: Boolean, entryStart?: String, entryEnd?: String): String => {
+export const getEventEntryDateRange = (entryIsEnd: boolean, entryStart?: string, entryEnd?: string): string => {
   if (entryIsEnd) {
     return '已截止';
   }
@@ -25,7 +25,7 @@ export const getEventEntryDateRange = (entryIsEnd: Boolean, entryStart?: String,
   return null;
 }
 
-const getDistanceColor = (distance: Number): String => {
+const getDistanceColor = (distance: number): string => {
   if (distance < 21) {
     return 'green';
   }

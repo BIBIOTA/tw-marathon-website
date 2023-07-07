@@ -32,6 +32,7 @@ import { useMessage } from '@/store/message';
 import { getEvents } from '@/apis/events';
 import { SearchParamsDto } from '@/dtos/search-param-dto';
 import { EventsResponseDto } from '@/dtos/events-response-dto';
+import { getSearchParamsDtoFromUrlQuery, setEventToUrlQuery } from '@/libs/url';
 import Input from './input.vue';
 import Checkbox from './checkbox.vue';
 import DatePicker from './date-picker.vue';
@@ -53,11 +54,15 @@ export default defineComponent({
       { label: '開放報名中', value: true },
     ];
 
+    const store = useStore();
+
     onMounted(async () => {
+      const { setSearchParams } = store;
+
+      await setSearchParams(getSearchParamsDtoFromUrlQuery());
       await search();
     })
 
-    const store = useStore();
     const messageStore = useMessage();
 
     async function search() {
@@ -77,7 +82,7 @@ export default defineComponent({
         dateRange: getDateRange,
         onlyRegistering: getOnlyRegistering,
       }
-      
+      setEventToUrlQuery(params);
       setIsApiLoading(true);
       getEvents(params).then((data: EventsResponseDto) => {
         setTotalCount(data.totalCount);
