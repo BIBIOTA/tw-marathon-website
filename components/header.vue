@@ -1,8 +1,12 @@
 <template>
-  <div class="m-auto w-80 flex justify-center pt-10 pb-5 mb-10 border-b-4 lg:w-3/12 lg:mb-2">
-    <h1 class="text-3xl font-bold">
-      台灣路跑賽事
-    </h1>
+  <div
+   style="background-color: #7dd3fc;" 
+    class="lg:flex lg:justify-start lg:mb-2 mb-5 rounded-md">
+    <div class="bg-blue-400 px-20 rounded-md py-5 cursor-pointer" @click="toIndex">
+      <h1 class="lg:text-left text-center text-3xl font-bold text-indigo-50">
+        台灣路跑賽事
+      </h1>
+    </div>
   </div>
 </template>
 <script>
@@ -11,7 +15,13 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'Header',
   setup() {
-    return {}
+    function toIndex() {
+      window.location.href = '/';
+    }
+
+    return {
+      toIndex,
+    }
   },
 })
 </script>
