@@ -1,10 +1,9 @@
-// https://v3.nuxtjs.org/api/configuration/nuxt.config
+// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  css: ['ant-design-vue/dist/antd.css', '~/assets/css/main.css'],
-  buildModules: ['@pinia/nuxt'],
-  build: {
-    postcss: {
-      postcssOptions: require('./postcss.config.js'),
-    },
-  }
+  modules: ['@nuxt/ui', '@pinia/nuxt'],
+  css: ['~/assets/css/main.css'],
+  compatibilityDate: '2025-01-01',
+  imports: {
+    dirs: ['store'],
+  },
 })

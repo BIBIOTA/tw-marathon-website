@@ -1,121 +1,109 @@
 <template>
-  <div class="my-2">
-    <div class="searchBox">
-      <div class="lg:border-r-2 lg:py-2">
-        <Input />
+  <div class="my-4">
+    <UCard>
+      <!-- Mobile: collapsible search -->
+      <div class="lg:hidden">
+        <UCollapsible v-model:open="searchOpen">
+          <UButton
+            variant="ghost"
+            block
+            :icon="searchOpen ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+            trailing
+          >
+            搜尋條件
+          </UButton>
+
+          <template #content>
+            <div class="flex flex-col gap-3 pt-3">
+              <SearchInput />
+              <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" />
+              <div class="flex items-center gap-2">
+                <USwitch v-model="store.onlyRegistering" />
+                <span class="text-sm">開放報名中</span>
+              </div>
+              <SearchDatePicker />
+              <SearchButton @search="search" />
+            </div>
+          </template>
+        </UCollapsible>
       </div>
-      <div class="lg:border-r-2 lg:py-2">
-        <Checkbox :options="marathonOptions" :keyName="'distances'" />
-      </div>
-      <div class="lg:border-r-2 lg:py-2">
-        <Checkbox :options="entryOptions" :keyName="'onlyRegistering'" />
-      </div>
-      <div class="lg:border-r-2 lg:py-2">
-        <DatePicker />
-      </div>
-      <div>
+
+      <!-- Desktop: inline search -->
+      <div class="hidden lg:flex items-center gap-4">
+        <SearchInput />
+        <USeparator orientation="vertical" class="h-8" />
+        <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" />
+        <USeparator orientation="vertical" class="h-8" />
+        <div class="flex items-center gap-2">
+          <USwitch v-model="store.onlyRegistering" />
+          <span class="text-sm whitespace-nowrap">開放報名中</span>
+        </div>
+        <USeparator orientation="vertical" class="h-8" />
+        <SearchDatePicker />
         <SearchButton @search="search" />
       </div>
+    </UCard>
+
+    <!-- Loading skeleton -->
+    <div v-if="store.isApiLoading" class="mt-4 space-y-3">
+      <USkeleton v-for="i in 8" :key="i" class="h-12 w-full" />
     </div>
-    <div>
-      <div class="mx-2 mb-2">
-        <Table />
-      </div>
+
+    <!-- Empty state -->
+    <div v-else-if="!store.isApiLoading && store.events.length === 0 && hasSearched" class="mt-8 text-center text-muted py-12">
+      <UIcon name="i-lucide-search-x" class="size-12 mx-auto mb-3 text-dimmed" />
+      <p class="text-lg font-medium">沒有找到符合條件的賽事</p>
+      <p class="text-sm text-dimmed mt-1">請嘗試調整搜尋條件</p>
     </div>
-    <Modal />
+
+    <!-- Table -->
+    <div v-else class="mt-4">
+      <SearchTable />
+    </div>
+
+    <SearchModal />
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-import { useStore } from '@/store/main';
-import { useMessage } from '@/store/message';
-import { getEvents } from '@/apis/events';
-import { SearchParamsDto } from '@/dtos/search-param-dto';
-import { EventsResponseDto } from '@/dtos/events-response-dto';
-import { getSearchParamsDtoFromUrlQuery, setEventToUrlQuery } from '@/libs/url';
-import Input from './input.vue';
-import Checkbox from './checkbox.vue';
-import DatePicker from './date-picker.vue';
-import SearchButton from './search-button.vue';
-import Table from './table.vue';
-import Modal from './modal.vue';
 
-export default defineComponent({
-  name: 'SearchBar',
-  setup() {
+<script setup lang="ts">
+import { getSearchParamsDtoFromUrlQuery, setEventToUrlQuery } from '@/libs/url'
+import { getEvents } from '@/apis/events'
+import type { SearchParamsDto } from '@/dtos/search-param-dto'
+import type { EventsResponseDto } from '@/dtos/events-response-dto'
 
-    const marathonOptions = [
-      { label: '全馬', value: 'MARATHON' },
-      { label: '半馬', value: 'HALF_MARATHON' },
-      { label: '10公里', value: 'TEN_K' },
-    ];
+const marathonOptions = [
+  { label: '全馬', value: 'MARATHON' },
+  { label: '半馬', value: 'HALF_MARATHON' },
+  { label: '10公里', value: 'TEN_K' },
+]
 
-    const entryOptions = [
-      { label: '開放報名中', value: true },
-    ];
+const store = useStore()
+const searchOpen = ref(true)
+const hasSearched = ref(false)
 
-    const store = useStore();
+onMounted(async () => {
+  store.setSearchParams(getSearchParamsDtoFromUrlQuery())
+  await search()
+})
 
-    onMounted(async () => {
-      const { setSearchParams } = store;
-
-      await setSearchParams(getSearchParamsDtoFromUrlQuery());
-      await search();
-    })
-
-    const messageStore = useMessage();
-
-    async function search() {
-      const {
-        getKeywords,
-        getDistances,
-        getDateRange,
-        getOnlyRegistering,
-        setIsApiLoading,
-        setTotalCount,
-        setEvents
-      } = store;
-
-      const params: SearchParamsDto = {
-        keywords: getKeywords,
-        distances: getDistances,
-        dateRange: getDateRange,
-        onlyRegistering: getOnlyRegistering,
-      }
-      setEventToUrlQuery(params);
-      setIsApiLoading(true);
-      getEvents(params).then((data: EventsResponseDto) => {
-        setTotalCount(data.totalCount);
-        setEvents(data.events);
-      }).catch(() => {
-        messageStore.error('發生例外錯誤，資料取得失敗');
-      }).finally(() => {
-        setIsApiLoading(false);
-      });
-    }
-
-    return {
-      entryOptions,
-      marathonOptions,
-      store,
-      search,
-    };
-  },
-  components: {
-    Input,
-    Checkbox,
-    DatePicker,
-    SearchButton,
-    Table,
-    Modal
-},
-});
+async function search() {
+  const params: SearchParamsDto = {
+    keywords: store.getKeywords,
+    distances: store.getDistances,
+    dateRange: store.getDateRange,
+    onlyRegistering: store.getOnlyRegistering,
+  }
+  setEventToUrlQuery(params)
+  store.setIsApiLoading(true)
+  try {
+    const data: EventsResponseDto = await getEvents(params)
+    store.setTotalCount(data.totalCount)
+    store.setEvents(data.events)
+    hasSearched.value = true
+  } catch {
+    useToast().add({ title: '發生例外錯誤，資料取得失敗', color: 'error' })
+  } finally {
+    store.setIsApiLoading(false)
+  }
+}
 </script>
-<style scoped>
-  div.searchBox {
-    @apply flex flex-col justify-center items-center lg:flex-row;
-  }
-  div.searchBox div {
-    @apply mx-2 mb-2 lg:mb-0;
-  }
-</style>

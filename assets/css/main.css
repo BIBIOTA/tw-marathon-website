@@ -1,10 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.ant-btn-primary {
-  background-color: #7dd3fc;
-}
-.ant-btn-primary:active {
-  background-color: #e0f2fe;
-}
+@import "tailwindcss";
+@import "@nuxt/ui";

@@ -1,118 +1,105 @@
 <template>
-  <div>
-    <a-modal v-model:visible="store.visibleModal" :title="getTitle()" :closable="false">
-      <template #footer>
-        <a-button key="submit" type="primary" @click="closeModal">關閉</a-button>
-      </template>
-      <table class="w-full">
-        <tr>
-          <td class="title">賽事資訊</td>
-          <td class="content">{{ getEventData('eventInfo') }}</td>
-        </tr>
-        <tr>
-          <td class="title">舉辦日期</td>
-          <td class="content">{{ getEventData('eventDate') }}</td>
-        </tr>
-        <tr>
-          <td class="title">起跑時間</td>
-          <td class="content">{{ getEventData('eventTime') }}</td>
-        </tr>
-        <tr>
-          <td class="title">舉辦地點</td>
-          <td class="content">{{ getEventData('location') }}</td>
-        </tr>
-        <tr>
-          <td class="title">賽事距離</td>
-          <td class="content">
-            <span v-if="store.eventModal && store.eventModal.distances.length > 0">
-              <a-tag
-                v-for="(distance, i) in getEventDistancesTags(store.eventModal.distances)"
-                :key="`modal_tag${i}`"
-                :color="distance.color"
-                class="my-1"
+  <UModal v-model:open="isOpen" :title="getTitle()">
+    <template #body>
+      <div class="divide-y divide-default">
+        <div
+          v-for="field in visibleFields"
+          :key="field.key"
+          class="flex py-3"
+        >
+          <div class="w-1/3 text-sm font-medium text-muted shrink-0">{{ field.label }}</div>
+          <div class="w-2/3 text-sm">
+            <template v-if="field.key === 'distances'">
+              <div class="flex flex-wrap gap-1">
+                <UBadge
+                  v-for="(distance, i) in getEventDistancesTags(store.eventModal!.distances)"
+                  :key="`modal_tag${i}`"
+                  :color="getBadgeColor(distance.color)"
+                  variant="subtle"
+                  size="sm"
+                >
+                  {{ distance.distance }}
+                </UBadge>
+              </div>
+            </template>
+            <template v-else-if="field.key === 'eventLink'">
+              <UButton
+                :to="getEventData('eventLink')"
+                target="_blank"
+                variant="link"
+                size="sm"
+                icon="i-lucide-external-link"
+                trailing
               >
-                {{ distance.distance }}
-              </a-tag>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td class="title">主辦單位</td>
-          <td class="content">{{ getEventData('agent') }}</td>
-        </tr>
-        <tr>
-          <td class="title">報名日期</td>
-          <td class="content" v-if="store.eventModal">{{ getEventEntryDateRange(store.eventModal.entryIsEnd, store.eventModal.entryStart, store.eventModal.entryEnd) }}</td>
-        </tr>
-        <tr>
-          <td class="title">賽事認證</td>
-          <td class="content">{{ getEventCertificate(store.eventModal) }}</td>
-        </tr>
-        <tr>
-          <td class="title">報名連結</td>
-          <td class="content">
-            <div v-if="getEventData('eventLink')">
-              <a :href="getEventData('eventLink')">
-                {{ getEventData('eventLink') }}
-              </a>
-            </div>
-            <div v-else>
-              -
-            </div>
-          </td>
-        </tr>
-      </table>
-    </a-modal>
-  </div>
-</template>
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { useStore } from '@/store/main';
-import { getEventDistancesTags, getEventEntryDateRange, getEventCertificate } from '@/libs/event-helper';
+                前往報名
+              </UButton>
+            </template>
+            <template v-else-if="field.key === 'entryDateRange'">
+              <UBadge v-if="store.eventModal?.entryIsEnd" color="neutral" variant="subtle" size="sm">已截止</UBadge>
+              <span v-else>{{ getEventEntryDateRange(store.eventModal!.entryIsEnd, store.eventModal!.entryStartDate, store.eventModal!.entryEndDate) }}</span>
+            </template>
+            <template v-else-if="field.key === 'eventCertificate'">
+              {{ getEventCertificate(store.eventModal) }}
+            </template>
+            <template v-else>
+              {{ getEventData(field.key) }}
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
 
-export default defineComponent({
-    name: "Modal",
-    setup() {
-        const store = useStore();
-        const closeModal = () => {
-            store.setVisiableModal(false);
-            store.setEventModal(null);
-        };
-        const getTitle = () => {
-            if (store.eventModal) {
-                return store.eventModal.eventName;
-            }
-            return null;
-        };
-        const getEventData = (key : string) => {
-            if (store.eventModal) {
-                return store.eventModal[key] ?? '-';
-            }
-            return '-';
-        };
-        return {
-            store,
-            getTitle,
-            getEventData,
-            getEventEntryDateRange,
-            getEventDistancesTags,
-            getEventCertificate,
-            closeModal,
-        };
-    },
-});
+    <template #footer="{ close }">
+      <UButton label="關閉" variant="outline" class="ml-auto" @click="close" />
+    </template>
+  </UModal>
+</template>
+
+<script setup lang="ts">
+import { getEventDistancesTags, getEventEntryDateRange, getEventCertificate, getBadgeColor } from '@/libs/event-helper'
+
+const store = useStore()
+
+const isOpen = computed({
+  get: () => store.visibleModal,
+  set: (val: boolean) => {
+    store.setVisiableModal(val)
+    if (!val) store.setEventModal(null)
+  },
+})
+
+const fields = [
+  { key: 'eventInfo', label: '賽事資訊' },
+  { key: 'eventDate', label: '舉辦日期' },
+  { key: 'eventTime', label: '起跑時間' },
+  { key: 'location', label: '舉辦地點' },
+  { key: 'distances', label: '賽事距離' },
+  { key: 'agent', label: '主辦單位' },
+  { key: 'entryDateRange', label: '報名日期' },
+  { key: 'eventCertificate', label: '賽事認證' },
+  { key: 'eventLink', label: '報名連結' },
+]
+
+const visibleFields = computed(() => {
+  if (!store.eventModal) return []
+  return fields.filter(field => {
+    if (field.key === 'distances') return store.eventModal!.distances?.length > 0
+    if (field.key === 'eventLink') return !!store.eventModal!.eventLink
+    if (field.key === 'eventCertificate') {
+      const cert = getEventCertificate(store.eventModal)
+      return cert && cert !== '-'
+    }
+    if (field.key === 'entryDateRange') return true
+    const val = getEventData(field.key)
+    return val && val !== '-'
+  })
+})
+
+function getTitle() {
+  return store.eventModal?.eventName ?? ''
+}
+
+function getEventData(key: string) {
+  return store.eventModal?.[key] ?? '-'
+}
 </script>
-<style scoped>
-  table tr {
-    @apply border-b-2 mb-4;
-  }
-  table tr td.title{
-    @apply w-1/3 py-4;
-  }
-  table tr td.content{
-    @apply w-2/3 py-4;
-  }
-  table tr td.content div {
-    max-width: 200px;
-  }
-</style>

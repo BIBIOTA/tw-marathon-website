@@ -1,27 +1,17 @@
 <template>
-  <a-checkbox-group v-model:value="store[keyName]" :options="options" />
+  <UCheckboxGroup
+    v-model="store[keyName]"
+    :items="items"
+    :orientation="orientation"
+  />
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { useStore } from '@/store/main';
 
-export default defineComponent({
-  name: 'Checkbox',
-  props: {
-    options: {
-      type: Array,
-      required: true,
-    },
-    keyName: {
-      type: String,
-      required: true,
-    },
-  },
-  setup() {
-    const store = useStore()
-    return {
-      store,
-    }
-  },
-})
+<script setup lang="ts">
+defineProps<{
+  items: { label: string; value: string | boolean }[]
+  keyName: string
+  orientation?: 'horizontal' | 'vertical'
+}>()
+
+const store = useStore()
 </script>

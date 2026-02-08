@@ -66,6 +66,18 @@ export const getEventDistancesTags = (distances: EventDistanceDto[]): EventDista
   });
 }
 
+const badgeColorMap: Record<string, string> = {
+  green: 'success',
+  orange: 'warning',
+  purple: 'secondary',
+  magenta: 'error',
+  gold: 'warning',
+}
+
+export const getBadgeColor = (color: string) => {
+  return (badgeColorMap[color] || 'neutral') as any
+}
+
 export const getEventCertificate = (event: EventDto) => {
   if (event) {
       switch (event.eventCertificate) {

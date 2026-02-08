@@ -8,5 +8,5 @@ export class EventTableDto {
   location: string
   distances: EventDistanceTagDto[]
   agent?: string
-  entryDateRage?: string
+  entryDateRange?: string
 }

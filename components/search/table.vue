@@ -1,146 +1,134 @@
 <template>
-  <a-table
-    :pagination="pagination"
+  <UTable
+    ref="tableRef"
+    v-model:pagination="pagination"
+    :data="data"
     :columns="columns"
-    :data-source="data"
-    @resizeColumn="handleResizeColumn"
-    @change="change"
+    :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
+    class="w-full [&_table]:table-fixed [&_table]:w-full [&>div]:!overflow-x-clip"
   >
-    <template #headerCell="{ column }">
-      <span>
-        {{ column.title }}
-      </span>
+    <template #eventDate-cell="{ row }">
+      <span class="whitespace-nowrap">{{ row.original.eventDate }}</span>
     </template>
 
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'distances'">
-        <span>
-          <a-tag
-            v-for="(distance, i) in record.distances"
-            :key="`distance_${i}`"
-            :color="distance.color"
-            class="my-1"
-          >
-            {{ distance.distance }}
-          </a-tag>
-        </span>
-      </template>
-      <template v-if="column.key === 'id'">
-        <span>
-          <a-button @click="openModal(record.id)" type="primary">更多</a-button>
-        </span>
-      </template>
+    <template #distances-cell="{ row }">
+      <div class="flex flex-wrap gap-1">
+        <UBadge
+          v-for="(distance, i) in row.original.distances"
+          :key="`distance_${i}`"
+          :color="getBadgeColor(distance.color)"
+          variant="subtle"
+          size="sm"
+        >
+          {{ distance.distance }}
+        </UBadge>
+      </div>
     </template>
-  </a-table>
+
+    <template #entryDateRange-cell="{ row }">
+      <UBadge
+        v-if="isEntryEnded(row.original.id)"
+        color="neutral"
+        variant="subtle"
+        size="sm"
+      >
+        已截止
+      </UBadge>
+      <span v-else class="text-sm">{{ row.original.entryDateRange || '-' }}</span>
+    </template>
+
+    <template #id-cell="{ row }">
+      <UButton
+        icon="i-lucide-eye"
+        size="xs"
+        variant="ghost"
+        color="neutral"
+        @click="openModal(row.original.id)"
+      />
+    </template>
+  </UTable>
+
+  <div v-if="data.length > 0" class="flex justify-center mt-4">
+    <UPagination
+      :page="(pagination.pageIndex ?? 0) + 1"
+      :total="data.length"
+      :items-per-page="pagination.pageSize"
+      @update:page="(p: number) => pagination = { ...pagination, pageIndex: p - 1 }"
+    />
+  </div>
 </template>
-<script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
-import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
-import type { TableColumnsType } from 'ant-design-vue';
-import { PaginationConfig } from 'ant-design-vue/lib/pagination';
-import { useStore } from '@/store/main';
-import { EventTableDto } from '@/dtos/event-table-dto';
 
-export default defineComponent({
-  components: {
-    SmileOutlined,
-    DownOutlined,
+<script setup lang="ts">
+import { getPaginationRowModel } from '@tanstack/vue-table'
+import type { TableColumn } from '@nuxt/ui'
+import type { EventTableDto } from '@/dtos/event-table-dto'
+import { getBadgeColor } from '@/libs/event-helper'
+
+const store = useStore()
+
+const data = computed<EventTableDto[]>(() => store.getEventsToTableData)
+
+const pagination = ref({
+  pageIndex: 0,
+  pageSize: 10,
+})
+
+watch(data, () => {
+  pagination.value.pageIndex = 0
+})
+
+const columns: TableColumn<EventTableDto>[] = [
+  {
+    accessorKey: 'eventDate',
+    header: '舉辦日期',
+    meta: { class: { td: 'whitespace-nowrap w-24 lg:w-28', th: 'whitespace-nowrap w-24 lg:w-28' } },
   },
-  setup() {
-    const store = useStore();
-
-    function resetPagination(pageSize: number): void {
-      pagination.current = 1;
-      pagination.pageSize = pageSize;
-    }
-
-    let data = ref<EventTableDto[]>([])
-    watch(
-      () => store.getEventsToTableData,
-      (newEventsData) => {
-        data.value = newEventsData;
-        resetPagination(pagination.pageSize);
-      }
-    );
-
-    const pagination = reactive<PaginationConfig>({
-      current: 1,
-      pageSize: 10,
-    });
-
-    const columns = ref<TableColumnsType>([
-      {
-        title: '舉辦日期',
-        dataIndex: 'eventDate',
-        key: 'eventDate',
-        width: '10%',
-      },
-      {
-        title: '起跑時間',
-        dataIndex: 'eventTime',
-        key: 'eventTime',
-        width: '10%',
-        responsive: ['md'],
-      },
-      {
-        title: '賽事名稱',
-        dataIndex: 'eventName',
-        key: 'eventName',
-        width: '20%',
-      },
-      {
-        title: '舉辦地點',
-        key: 'location',
-        dataIndex: 'location',
-        width: '20%',
-        responsive: ['lg'],
-      },
-      {
-        title: '賽事距離',
-        key: 'distances',
-        dataIndex: 'distances',
-        width: '15%',
-        responsive: ['sm'],
-      },
-      {
-        title: '主辦單位',
-        key: 'agent',
-        dataIndex: 'agent',
-        width: '15%',
-        responsive: ['lg'],
-      },
-      {
-        title: '報名日期',
-        key: 'entryDateRage',
-        dataIndex: 'entryDateRage',
-        width: '15%',
-        responsive: ['lg'],
-      },
-      {
-        title: '更多',
-        key: 'id',
-        dataIndex: 'id',
-        width: '10%',
-        className: 'more',
-      },
-    ]);
-
-    return {
-      pagination,
-      data,
-      columns,
-      handleResizeColumn: (w, col) => {
-        col.width = w;
-      },
-      change: (data: PaginationConfig) => {
-        pagination.current = data.current;
-        pagination.pageSize = data.pageSize;
-      },
-      openModal: (id: number) => {
-        store.setVisiableModal(true);
-        store.setEventModal(store.events[id - 1]);
-      },
-    };
+  {
+    accessorKey: 'eventTime',
+    header: '起跑時間',
+    meta: { class: { td: 'hidden md:table-cell md:w-24', th: 'hidden md:table-cell md:w-24 whitespace-nowrap' } },
   },
-});
+  {
+    accessorKey: 'eventName',
+    header: '賽事名稱',
+    meta: { class: { td: 'truncate' } },
+  },
+  {
+    accessorKey: 'location',
+    header: '舉辦地點',
+    meta: { class: { td: 'hidden lg:table-cell truncate', th: 'hidden lg:table-cell' } },
+  },
+  {
+    accessorKey: 'distances',
+    header: '賽事距離',
+    meta: { class: { td: 'hidden sm:table-cell sm:w-24 lg:w-28', th: 'hidden sm:table-cell sm:w-24 lg:w-28' } },
+  },
+  {
+    accessorKey: 'agent',
+    header: '主辦單位',
+    meta: { class: { td: 'hidden lg:table-cell truncate', th: 'hidden lg:table-cell' } },
+  },
+  {
+    accessorKey: 'entryDateRange',
+    header: '報名狀態',
+    meta: { class: { td: 'hidden lg:table-cell lg:w-44', th: 'hidden lg:table-cell lg:w-44' } },
+  },
+  {
+    accessorKey: 'id',
+    header: '',
+    meta: { class: { th: 'w-10', td: 'w-10' } },
+  },
+]
+
+function isEntryEnded(id: number) {
+  const event = store.events.find(e => e.id === id)
+  return event?.entryIsEnd
+}
+
+function openModal(id: number) {
+  const event = store.events.find(e => e.id === id)
+  if (!event) return
+  store.setVisiableModal(true)
+  store.setEventModal(event)
+}
 </script>

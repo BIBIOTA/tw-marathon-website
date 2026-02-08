@@ -1,27 +1,20 @@
 <template>
-  <div
-   style="background-color: #7dd3fc;" 
-    class="lg:flex lg:justify-start lg:mb-2 mb-5 rounded-md">
-    <div class="bg-blue-400 px-20 rounded-md py-5 cursor-pointer" @click="toIndex">
-      <h1 class="lg:text-left text-center text-3xl font-bold text-indigo-50">
+  <header class="bg-primary py-4 px-6 mb-4 rounded-md">
+    <div class="container mx-auto flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-white cursor-pointer" @click="toIndex">
         台灣路跑賽事
       </h1>
+      <span v-if="store.totalCount > 0" class="text-sm text-white/80">
+        共 {{ store.totalCount }} 筆賽事
+      </span>
     </div>
-  </div>
+  </header>
 </template>
-<script>
-import { defineComponent } from 'vue'
 
-export default defineComponent({
-  name: 'Header',
-  setup() {
-    function toIndex() {
-      window.location.href = '/';
-    }
+<script setup lang="ts">
+const store = useStore()
 
-    return {
-      toIndex,
-    }
-  },
-})
+function toIndex() {
+  window.location.href = '/'
+}
 </script>

@@ -1,55 +1,52 @@
 import { defineStore } from 'pinia';
 import dayjs from 'dayjs';
-import { EventDto } from '@/dtos/events-response-dto';
-import { EventTableDto } from '@/dtos/event-table-dto';
+import type { EventDto } from '@/dtos/events-response-dto';
+import type { EventTableDto } from '@/dtos/event-table-dto';
 import { getEventDistancesTags, getEventEntryDateRange } from '@/libs/event-helper';
-import _ from 'lodash';
-import { SearchParamsDto } from '@/dtos/search-param-dto';
+import type { SearchParamsDto } from '@/dtos/search-param-dto';
 
 export const useStore = defineStore('Main', {
   state: () => ({
     isApiLoading: false,
     visibleModal: false,
-    eventModal: null,
+    eventModal: null as EventDto | null,
     keywords: '',
-    distances: [],
-    onlyRegistering: [false],
-    dateRange: null,
-    events: [],
+    distances: [] as string[],
+    onlyRegistering: false,
+    dateRange: null as [Date, Date] | null,
+    events: [] as EventDto[],
     totalCount: 0,
   }),
   getters: {
-    getEvents: (state): EventTableDto[] => state.events,
+    getEvents: (state): EventDto[] => state.events,
     getEventsToTableData: (state): EventTableDto[] => {
-      const { events } = state;
-      if (events.length === 0) {
-        return [];
-      }
+      if (state.events.length === 0) return [];
 
-      return events.map((event: EventDto): EventTableDto => {
-        return {
-          id: event.id,
-          eventDate: event.eventDate,
-          eventTime: event.eventTime,
-          eventName: event.eventName + (event.eventInfo ? ` (${event.eventInfo})` : ''),
-          location: event.location,
-          distances: getEventDistancesTags(event.distances),
-          agent: event.agent,
-          entryDateRage: getEventEntryDateRange(event.entryIsEnd, event.entryStartDate, event.entryEndDate),
-        };
-      });
+      return state.events.map((event: EventDto): EventTableDto => ({
+        id: event.id,
+        eventDate: event.eventDate,
+        eventTime: event.eventTime,
+        eventName: event.eventName + (event.eventInfo ? ` (${event.eventInfo})` : ''),
+        location: event.location,
+        distances: getEventDistancesTags(event.distances),
+        agent: event.agent,
+        entryDateRange: getEventEntryDateRange(event.entryIsEnd, event.entryStartDate, event.entryEndDate),
+      }));
     },
-    getKeywords: (state): string|null => state.keywords !== '' ? state.keywords : null,
-    getDistances: (state): string[]|null => state.distances.length > 0 ? state.distances : null,
-    getOnlyRegistering: (state): boolean => _.first(state.onlyRegistering),
-    getDateRange: (state): string[]|null => state.dateRange ? state.dateRange.map((date) => dayjs(date).format('YYYY-MM-DD')) : null,
+    getKeywords: (state): string | null => state.keywords !== '' ? state.keywords : null,
+    getDistances: (state): string[] | null => state.distances.length > 0 ? state.distances : null,
+    getOnlyRegistering: (state): boolean => state.onlyRegistering,
+    getDateRange: (state): string[] | null =>
+      state.dateRange
+        ? state.dateRange.map((date: Date) => dayjs(date).format('YYYY-MM-DD'))
+        : null,
     getVisibleModal: (state): boolean => state.visibleModal,
   },
   actions: {
     setSearchParams(dto: SearchParamsDto): void {
       this.keywords = dto.keywords;
       this.distances = dto.distances;
-      this.onlyRegistering = [dto.onlyRegistering];
+      this.onlyRegistering = dto.onlyRegistering ?? false;
       this.dateRange = dto.dateRange;
     },
     setIsApiLoading(status: boolean): void {
@@ -64,8 +61,8 @@ export const useStore = defineStore('Main', {
     setVisiableModal(status: boolean): void {
       this.visibleModal = status;
     },
-    setEventModal(eventModal: EventDto): void {
+    setEventModal(eventModal: EventDto | null): void {
       this.eventModal = eventModal;
-    }
+    },
   },
-})
+});
