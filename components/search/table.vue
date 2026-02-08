@@ -53,7 +53,7 @@
       :page="(pagination.pageIndex ?? 0) + 1"
       :total="data.length"
       :items-per-page="pagination.pageSize"
-      @update:page="(p: number) => pagination = { ...pagination, pageIndex: p - 1 }"
+      @update:page="onPageChange"
     />
   </div>
 </template>
@@ -119,6 +119,13 @@ const columns: TableColumn<EventTableDto>[] = [
     meta: { class: { th: 'w-10', td: 'w-10' } },
   },
 ]
+
+function onPageChange(p: number) {
+  pagination.value = { ...pagination.value, pageIndex: p - 1 }
+  nextTick(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
+}
 
 function isEntryEnded(id: number) {
   const event = store.events.find(e => e.id === id)
