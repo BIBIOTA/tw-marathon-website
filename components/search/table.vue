@@ -7,6 +7,12 @@
     :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
     class="w-full [&_table]:table-fixed [&_table]:w-full [&>div]:!overflow-x-clip"
   >
+    <template #eventName-cell="{ row }">
+      <div class="overflow-x-auto whitespace-nowrap scrollbar-hide lg:overflow-hidden lg:text-ellipsis">
+        {{ row.original.eventName }}
+      </div>
+    </template>
+
     <template #eventDate-cell="{ row }">
       <span class="whitespace-nowrap">{{ row.original.eventDate }}</span>
     </template>
@@ -91,7 +97,7 @@ const columns: TableColumn<EventTableDto>[] = [
   {
     accessorKey: 'eventName',
     header: '賽事名稱',
-    meta: { class: { td: 'truncate' } },
+    meta: { class: { td: 'max-w-0' } },
   },
   {
     accessorKey: 'location',
@@ -122,9 +128,6 @@ const columns: TableColumn<EventTableDto>[] = [
 
 function onPageChange(p: number) {
   pagination.value = { ...pagination.value, pageIndex: p - 1 }
-  nextTick(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
 }
 
 function isEntryEnded(id: number) {
