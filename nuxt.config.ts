@@ -13,6 +13,9 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://marathontw.bibiota.com' },
       ],
+      meta: [
+        { name: 'google-site-verification', content: 'RuYdOuGQ6Dm2ASQ2rnZvnIkENMsoktAIs-FjwEEzJG8' },
+      ],
     },
   },
 
