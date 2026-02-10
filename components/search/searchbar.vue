@@ -14,20 +14,21 @@
           </UButton>
 
           <template #content>
-            <div class="flex flex-col gap-3 pt-3">
+            <div class="flex flex-col gap-4 pt-3">
               <SearchInput />
-              <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" />
-              <UFieldGroup>
+              <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" size="xl" wrapperClass="text-base" fieldsetClass="justify-around w-full" />
+              <div class="flex gap-2">
                 <UButton
                   v-for="option in entryStatusOptions"
                   :key="option.value"
                   :label="option.label"
                   :variant="store.entryStatus === option.value ? 'solid' : 'outline'"
                   color="neutral"
-                  size="sm"
+                  size="md"
+                  class="flex-1"
                   @click="store.entryStatus = option.value"
                 />
-              </UFieldGroup>
+              </div>
               <SearchDatePicker />
               <SearchButton @search="search" />
             </div>
