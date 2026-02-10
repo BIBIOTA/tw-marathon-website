@@ -12,17 +12,15 @@
 
 <script setup lang="ts">
 useHead({
-  title: '台灣路跑賽事查詢',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   charset: 'utf-8',
+  link: [
+    { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+  ],
   meta: [
-    { name: 'description', content: '簡易查詢近期台灣路跑賽事。' },
-    { property: 'og:title', content: '台灣路跑賽事查詢' },
-    { property: 'og:site_name', content: '台灣路跑賽事查詢' },
-    { property: 'og:description', content: '簡易查詢近期台灣路跑賽事。' },
-    { property: 'og:type', content: 'website' },
-    { property: 'og:locale', content: 'zh-tw' },
-    { property: 'og:site', content: 'https://marathontw-web.bibiota.com/' },
+    { property: 'og:image', content: 'https://marathontw-web.bibiota.com/og-image.png' },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
   ],
 })
 </script>
