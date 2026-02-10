@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import type { EventDto } from '@/dtos/events-response-dto';
 import type { EventTableDto } from '@/dtos/event-table-dto';
 import { getEventDistancesTags, getEventEntryDateRange } from '@/libs/event-helper';
-import type { SearchParamsDto } from '@/dtos/search-param-dto';
+import type { SearchParamsDto, EntryStatus } from '@/dtos/search-param-dto';
 
 export const useStore = defineStore('Main', {
   state: () => ({
@@ -12,7 +12,7 @@ export const useStore = defineStore('Main', {
     eventModal: null as EventDto | null,
     keywords: '',
     distances: [] as string[],
-    onlyRegistering: false,
+    entryStatus: 'all' as EntryStatus,
     dateRange: null as [Date, Date] | null,
     events: [] as EventDto[],
     totalCount: 0,
@@ -35,7 +35,7 @@ export const useStore = defineStore('Main', {
     },
     getKeywords: (state): string | null => state.keywords !== '' ? state.keywords : null,
     getDistances: (state): string[] | null => state.distances.length > 0 ? state.distances : null,
-    getOnlyRegistering: (state): boolean => state.onlyRegistering,
+    getEntryStatus: (state): EntryStatus => state.entryStatus,
     getDateRange: (state): string[] | null =>
       state.dateRange
         ? state.dateRange.map((date: Date) => dayjs(date).format('YYYY-MM-DD'))
@@ -46,7 +46,7 @@ export const useStore = defineStore('Main', {
     setSearchParams(dto: SearchParamsDto): void {
       this.keywords = dto.keywords;
       this.distances = dto.distances;
-      this.onlyRegistering = dto.onlyRegistering ?? false;
+      this.entryStatus = dto.entryStatus ?? 'all';
       this.dateRange = dto.dateRange;
     },
     setIsApiLoading(status: boolean): void {

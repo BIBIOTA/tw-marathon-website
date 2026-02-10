@@ -37,7 +37,7 @@ Nuxt 4 根據目錄路徑 + 檔名自動生成元件名稱：
 
 - 單一端點: `https://marathontw.bibiota.com/events`
 - API 層在 `apis/events.ts`
-- 參數: keywords, distances, dateRange, onlyRegistering
+- 參數: keywords, distances, dateRange, onlyRegistering, entryIsEnd
 
 ### Data Flow
 

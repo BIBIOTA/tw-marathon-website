@@ -17,10 +17,17 @@
             <div class="flex flex-col gap-3 pt-3">
               <SearchInput />
               <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" />
-              <div class="flex items-center gap-2">
-                <USwitch v-model="store.onlyRegistering" />
-                <span class="text-sm">開放報名中</span>
-              </div>
+              <UFieldGroup>
+                <UButton
+                  v-for="option in entryStatusOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :variant="store.entryStatus === option.value ? 'solid' : 'outline'"
+                  color="neutral"
+                  size="sm"
+                  @click="store.entryStatus = option.value"
+                />
+              </UFieldGroup>
               <SearchDatePicker />
               <SearchButton @search="search" />
             </div>
@@ -34,10 +41,17 @@
         <USeparator orientation="vertical" class="h-8" />
         <SearchCheckbox :items="marathonOptions" keyName="distances" orientation="horizontal" />
         <USeparator orientation="vertical" class="h-8" />
-        <div class="flex items-center gap-2">
-          <USwitch v-model="store.onlyRegistering" />
-          <span class="text-sm whitespace-nowrap">開放報名中</span>
-        </div>
+        <UFieldGroup>
+          <UButton
+            v-for="option in entryStatusOptions"
+            :key="option.value"
+            :label="option.label"
+            :variant="store.entryStatus === option.value ? 'solid' : 'outline'"
+            color="neutral"
+            size="sm"
+            @click="store.entryStatus = option.value"
+          />
+        </UFieldGroup>
         <USeparator orientation="vertical" class="h-8" />
         <SearchDatePicker />
         <SearchButton @search="search" />
@@ -69,7 +83,14 @@
 import { getSearchParamsDtoFromUrlQuery, setEventToUrlQuery } from '@/libs/url'
 import { getEvents } from '@/apis/events'
 import type { SearchParamsDto } from '@/dtos/search-param-dto'
+import type { EntryStatus } from '@/dtos/search-param-dto'
 import type { EventsResponseDto } from '@/dtos/events-response-dto'
+
+const entryStatusOptions: { label: string; value: EntryStatus }[] = [
+  { label: '全部', value: 'all' },
+  { label: '開放報名中', value: 'registering' },
+  { label: '尚未截止', value: 'notEnded' },
+]
 
 const marathonOptions = [
   { label: '全馬', value: 'MARATHON' },
@@ -86,17 +107,32 @@ onMounted(async () => {
   await search()
 })
 
-async function search() {
-  const params: SearchParamsDto = {
+function buildApiParams(): Record<string, unknown> {
+  const params: Record<string, unknown> = {
     keywords: store.getKeywords,
     distances: store.getDistances,
     dateRange: store.getDateRange,
-    onlyRegistering: store.getOnlyRegistering,
   }
-  setEventToUrlQuery(params)
+  if (store.getEntryStatus === 'registering') {
+    params.onlyRegistering = true
+  } else if (store.getEntryStatus === 'notEnded') {
+    params.entryIsEnd = false
+  }
+  return params
+}
+
+async function search() {
+  const apiParams = buildApiParams()
+  const urlParams: SearchParamsDto = {
+    keywords: store.getKeywords,
+    distances: store.getDistances,
+    dateRange: store.getDateRange,
+    entryStatus: store.getEntryStatus,
+  }
+  setEventToUrlQuery(urlParams)
   store.setIsApiLoading(true)
   try {
-    const data: EventsResponseDto = await getEvents(params)
+    const data: EventsResponseDto = await getEvents(apiParams)
     store.setTotalCount(data.totalCount)
     store.setEvents(data.events)
     hasSearched.value = true

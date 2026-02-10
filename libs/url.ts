@@ -1,4 +1,5 @@
 import { SearchParamsDto } from "@/dtos/search-param-dto";
+import type { EntryStatus } from "@/dtos/search-param-dto";
 import dayjs from "dayjs";
 
 export const getSearchParamsDtoFromUrlQuery = (): SearchParamsDto => {
@@ -7,7 +8,7 @@ export const getSearchParamsDtoFromUrlQuery = (): SearchParamsDto => {
     dto.keywords = getKeywordsFromUrlQuery(urlParams);
     dto.dateRange = getDateRangeFromUrlQuery(urlParams);
     dto.distances = getDistancesFromUrlQuery(urlParams);
-    dto.onlyRegistering = getOnlyRegisteringFromUrlQuery(urlParams);
+    dto.entryStatus = getEntryStatusFromUrlQuery(urlParams);
     return dto;
 }
 
@@ -16,7 +17,7 @@ export const setEventToUrlQuery = (params: SearchParamsDto) => {
     url.searchParams.set('keywords', params.keywords);
     url.searchParams.set('distances', arrayToQueryString(params.distances));
     url.searchParams.set('dateRange', arrayToQueryString(params.dateRange));
-    url.searchParams.set('onlyRegistering', booleanToQueryString(params.onlyRegistering));
+    url.searchParams.set('entryStatus', params.entryStatus ?? 'all');
     window.history.pushState({}, '', url.toString());
 };
 
@@ -25,7 +26,7 @@ const getKeywordsFromUrlQuery = (params: URLSearchParams): string|null => {
     if (keywords === 'null') {
         return '';
     }
-    
+
     return keywords;
 }
 
@@ -53,8 +54,11 @@ const getDistancesFromUrlQuery = (params: URLSearchParams): string[] => {
     return distances.split(',');
 }
 
-const getOnlyRegisteringFromUrlQuery = (params: URLSearchParams): boolean => {
-    return params.get('onlyRegistering') === 'true';
+const VALID_ENTRY_STATUSES: EntryStatus[] = ['all', 'registering', 'notEnded'];
+
+const getEntryStatusFromUrlQuery = (params: URLSearchParams): EntryStatus => {
+    const value = params.get('entryStatus') as EntryStatus;
+    return VALID_ENTRY_STATUSES.includes(value) ? value : 'all';
 }
 
 const isValidDistancesQuery = (distances: string): boolean => {
@@ -94,7 +98,7 @@ const isValidateDateRangeQuery = (dateRange: string): boolean => {
 
 const isValidDateFormat = (date: string): boolean => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
-    
+
     return regex.test(date) && dayjs(date).isValid();
 }
 
@@ -102,14 +106,6 @@ const arrayToQueryString = (arr?: string[]): string => {
     if (arr === null || arr.length === 0) {
         return 'null';
     }
-    
-    return arr.join(',');
-}
 
-const booleanToQueryString = (bool: boolean): string => {
-    if (bool) {
-        return 'true';
-    }
-    
-    return 'false';
+    return arr.join(',');
 }
