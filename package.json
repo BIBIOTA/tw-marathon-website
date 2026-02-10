@@ -6,7 +6,11 @@
       "esbuild",
       "vue-demi",
       "lightningcss"
-    ]
+    ],
+    "overrides": {
+      "unhead": "2.1.4",
+      "@unhead/vue": "2.1.4"
+    }
   },
   "scripts": {
     "build": "nuxt build",

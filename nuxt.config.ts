@@ -30,4 +30,10 @@ export default defineNuxtConfig({
       url: 'https://marathontw-web.bibiota.com',
     },
   },
+
+  nitro: {
+    externals: {
+      inline: ['unhead', '@unhead/vue', '@unhead/schema-org', '@unhead/addons'],
+    },
+  },
 })
